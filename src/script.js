@@ -2,7 +2,8 @@ window.addEventListener('DOMContentLoaded', () => {
     const minutes = document.querySelector('.reminder__timer-minutes'),
         seconds = document.querySelector('.reminder__timer-seconds'),
         controlBtns = document.querySelectorAll('[data-control]'),
-        counterBtns = document.querySelectorAll('.reminder__length-btn');
+        counterBtns = document.querySelectorAll('.reminder__length-btn'),
+        sessionValue = document.querySelector('.reminder__length-value');
 
     //default value to show in timer 
     let defaultValue = 15,
@@ -11,7 +12,11 @@ window.addEventListener('DOMContentLoaded', () => {
     let timerId,
         counter;
 
+    //setup initial value
     minutes.textContent = defaultValue;
+    sessionValue.textContent = defaultValue;
+
+    /* CONTROL BUTTONS */
 
     //function helper to disable buttons
     function disableButtons() {
@@ -50,7 +55,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     break;
                 case "pause":
                     clearInterval(timerId);
-                    paused = true;
                     break;
                 case "reset":
                     clearInterval(timerId);
@@ -58,14 +62,18 @@ window.addEventListener('DOMContentLoaded', () => {
                     seconds.textContent = addZero(defaultZero);
                     //set counter to default
                     counter = defaultValue;
+                    sessionValue.textContent = counter;
                     enableButtons();
                     break;
             }
         })
     })
 
-    //get remaining time
 
+    /*TIMER SETUP*/
+
+
+    //get remaining time
     function getTimeLeft(deadline) {
         //get time diff in ms
         const timeRemaining = deadline - Date.parse(new Date());
@@ -107,16 +115,17 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     //helper to add zeroes
-
     function addZero(num) {
         return num >= 0 && num < 10 ? num = `0${num}` : num;
     }
 
-    //Adjusting timer, adding/substracting counter
 
-    function processClick(buttonsSelector, minutesSelector) {
-        const counterBtns = document.querySelectorAll(buttonsSelector);
-        const minutes = document.querySelector(minutesSelector);
+    /* COUNTER */
+
+    function processClick(buttonsSelector, minutesSelector, sessionValueSelector) {
+        const counterBtns = document.querySelectorAll(buttonsSelector),
+              minutes = document.querySelector(minutesSelector),
+              sessionValue  =document.querySelector(sessionValueSelector);
         counter = minutes.textContent;
         //add event listeners for btns
         counterBtns.forEach(btn => {
@@ -125,24 +134,26 @@ window.addEventListener('DOMContentLoaded', () => {
                 //use event.currentTarget because we have <i> in our button, so if we use event.target and click on i, then we get i in event.target and get wrong results
                 //but if we use currentTarget, we will have the element that contains event listener
                 const target = e.currentTarget;
-                
+
                 //check if we click on plus button we increment counter
                 if (target.classList.contains('reminder__length-plus')) {
                     //if counter 60 then stop add +1 to counter, same for 0
                     if (counter == 60) {
                         counter += 0;
+                        
                     } else {
                         counter++;
-                        console.log(counter);
                         minutes.textContent = addZero(counter);
+                        sessionValue.textContent = counter;
                     }
                     //else we decrement counter
                 } else {
-                    if (counter === 0) {
+                    if (counter === 1) {
                         counter -= 0;
                     } else {
                         counter--;
                         minutes.textContent = addZero(counter);
+                        sessionValue.textContent = counter;
                     }
                 }
             })
@@ -151,7 +162,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 
-    processClick('.reminder__length-btn', '.reminder__timer-minutes');
+    processClick('.reminder__length-btn', '.reminder__timer-minutes', '.reminder__length-value');
 
 
 })
