@@ -30,6 +30,18 @@ window.addEventListener('DOMContentLoaded', () => {
             btn.disabled = false;
         })
     }
+    //calculate deadline
+    function getDeadline() {
+         //get value from page
+         const minutesInMs = Number(minutes.textContent) * 60000;
+         const secondsInMs = Number(seconds.textContent) * 1000;
+         //transform to miliseconds
+         const miliseconds = minutesInMs + secondsInMs;
+         //get deadline
+         const endDate = (Date.parse(new Date()) + miliseconds);
+         //set timer
+         return endDate;
+    }
 
     //add event listeners for each control button
     controlBtns.forEach(btn => {
@@ -37,26 +49,24 @@ window.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const target = e.currentTarget;
             const control = target.dataset.control;
-
+            let endDate;
+            //depending on which button we clicked  handle different approaches
             switch (control) {
                 case "play":
-                    //get value from page
-                    const minutesInMs = Number(minutes.textContent) * 60000;
-                    const secondsInMs = Number(seconds.textContent) * 1000;
-                    //transform to miliseconds
-                    const miliseconds = minutesInMs + secondsInMs;
                     //get deadline
-                    const endDate = (Date.parse(new Date()) + miliseconds);
-                    //set timer
+                    //and start timer
+                    endDate = getDeadline();
                     setTimer(endDate);
 
                     //disable buttons when we start timer so we cant change counter
                     disableButtons();
                     break;
                 case "pause":
+                    //just clear timer
                     clearInterval(timerId);
                     break;
                 case "reset":
+                    //clear timer, reset minutes, sessionValue and counter to defaults and enable buttons
                     clearInterval(timerId);
                     minutes.textContent = defaultValue;
                     seconds.textContent = addZero(defaultZero);
@@ -65,6 +75,15 @@ window.addEventListener('DOMContentLoaded', () => {
                     sessionValue.textContent = counter;
                     enableButtons();
                     break;
+                case "repeat":
+                    //clear timer, set minutes and sessionValue to counter, get date and start timer
+                    clearInterval(timerId);
+                    minutes.textContent = counter;
+                    seconds.textContent = addZero(defaultZero);
+                    sessionValue.textContent = counter;
+                    endDate = getDeadline();
+                    setTimer(endDate);
+                    
             }
         })
     })
