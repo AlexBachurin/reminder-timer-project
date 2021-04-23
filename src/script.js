@@ -6,29 +6,27 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //default value to show in timer 
     let defaultValue = 15,
-        defaultZero = '00';
-    let timerId;
+        defaultZero = 0;
+    //timerId, counter for setupClock
+    let timerId,
+        counter;
 
     minutes.textContent = defaultValue;
-    //add event listener
-    // startBtn.addEventListener('click', (e) => {
-    //     e.preventDefault();
-    //     //get value from page
-    //     const minutesInt = Number(minutes.textContent);
-    //     //transform to miliseconds
-    //     const miliseconds = minutesInt * 60000;
-    //     //get deadline
-    //     const endDate = (Date.parse(new Date()) + miliseconds);
-    //     //set timer
-    //     setTimer(endDate);
-    //     //disable buttons when we start timer so we cant change counter
-    //     counterBtns.forEach(btn => {
-    //         btn.disabled = true;
-    //     })
 
-    // })
+    //function helper to disable buttons
+    function disableButtons() {
+        counterBtns.forEach(btn => {
+            btn.disabled = true;
+        })
+    }
+    //enable buttons
+    function enableButtons() {
+        counterBtns.forEach(btn => {
+            btn.disabled = false;
+        })
+    }
 
-    let paused = false;
+    //add event listeners for each control button
     controlBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.preventDefault();
@@ -48,9 +46,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     setTimer(endDate);
 
                     //disable buttons when we start timer so we cant change counter
-                    counterBtns.forEach(btn => {
-                        btn.disabled = true;
-                    })
+                    disableButtons();
                     break;
                 case "pause":
                     clearInterval(timerId);
@@ -59,10 +55,10 @@ window.addEventListener('DOMContentLoaded', () => {
                 case "reset":
                     clearInterval(timerId);
                     minutes.textContent = defaultValue;
-                    seconds.textContent = defaultZero;
-                    counterBtns.forEach(btn => {
-                        btn.disabled = false;
-                    })
+                    seconds.textContent = addZero(defaultZero);
+                    //set counter to default
+                    counter = defaultValue;
+                    enableButtons();
                     break;
             }
         })
@@ -102,9 +98,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 audio.volume = 0.2;
                 audio.loop = false;
                 audio.play();
-                counterBtns.forEach(btn => {
-                    btn.disabled = false;
-                })
+                enableButtons();
 
             }
         }
@@ -122,9 +116,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function processClick(buttonsSelector, minutesSelector) {
         const counterBtns = document.querySelectorAll(buttonsSelector);
-        const minutes = document.querySelector(minutesSelector)
-        let counter = minutes.textContent;
-
+        const minutes = document.querySelector(minutesSelector);
+        counter = minutes.textContent;
         //add event listeners for btns
         counterBtns.forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -132,6 +125,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 //use event.currentTarget because we have <i> in our button, so if we use event.target and click on i, then we get i in event.target and get wrong results
                 //but if we use currentTarget, we will have the element that contains event listener
                 const target = e.currentTarget;
+                
                 //check if we click on plus button we increment counter
                 if (target.classList.contains('reminder__length-plus')) {
                     //if counter 60 then stop add +1 to counter, same for 0
