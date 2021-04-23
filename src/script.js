@@ -1,7 +1,8 @@
 window.addEventListener('DOMContentLoaded', () => {
     const minutes = document.querySelector('.timer__minutes'),
         seconds = document.querySelector('.timer__seconds'),
-        startBtn = document.querySelector('.reminder__playBtn');
+        startBtn = document.querySelector('.reminder__playBtn'),
+        counterBtns = document.querySelectorAll('.reminder__length-btn');
 
 
     //add event listener
@@ -13,8 +14,12 @@ window.addEventListener('DOMContentLoaded', () => {
         const miliseconds = minutesInt * 60000;
         //get deadline
         const endDate = (Date.parse(new Date()) + miliseconds);
-
+        //set timer
         setTimer(endDate);
+        //disable buttons when we start timer so we cant change counter
+        counterBtns.forEach(btn => {
+            btn.disabled = true;
+        })
 
     })
 
@@ -56,6 +61,46 @@ window.addEventListener('DOMContentLoaded', () => {
         return num >= 0 && num < 10 ? num = `0${num}` : num;
     }
 
+    //Adjust timer
+
+    function processClick(buttonsSelector, minutesSelector) {
+        const counterBtns = document.querySelectorAll(buttonsSelector);
+        const minutes = document.querySelector(minutesSelector)
+        let counter = minutes.textContent;
+
+        //add event listeners for btns
+        counterBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                //use event.currentTarget because we have <i> in our button, so if we use event.target and click on i, then we get i in event.target and get wrong results
+                //but if we use currentTarget, we will have the element that contains event listener
+                const target = e.currentTarget;
+                //check if we click on plus button we increment counter
+                if (target.classList.contains('reminder__length-plus') ) { 
+                    //if counter 60 then stop add +1 to counter, same for 0
+                    if (counter == 60) {
+                        counter += 0;
+                    } else {
+                        counter++;
+                        console.log(counter);
+                        minutes.textContent = addZero(counter);
+                    }                  
+                //else we decrement counter
+                } else {
+                    if(counter === 0) {
+                       counter-= 0;
+                    } else{
+                        counter--;
+                        minutes.textContent = addZero(counter);
+                    }
+                } 
+            })
+        })
+    }  
+
+    
+
+    processClick('.reminder__length-btn', '.timer__minutes');
 
 
 })
