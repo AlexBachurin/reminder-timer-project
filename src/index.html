@@ -33,13 +33,17 @@
             <h3 class="reminder__session-title">
                 Session
             </h3>
-            <div class="timer">
-                <span class="timer__minutes">15</span>
+            <div class="reminder__timer">
+                <span class="reminder__timer-minutes">15</span>
                 :
-                <span class="timer__seconds">00</span>
+                <span class="reminder__timer-seconds">00</span>
             </div>
         </div>
-        <button class="reminder__playBtn">Play</button>
+        <div class="reminder__timer-btns">
+            <button data-control = "play" class="reminder__timer-btn">Play</button>
+            <button data-control = "pause" class="reminder__timer-btn">Pause</button>
+            <button data-control = "reset" class="reminder__timer-btn">Reset</button>
+        </div>
        </div>
     </section>
     <script src="script.js"></script>

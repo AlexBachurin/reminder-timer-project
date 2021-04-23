@@ -1,29 +1,71 @@
 window.addEventListener('DOMContentLoaded', () => {
-    const minutes = document.querySelector('.timer__minutes'),
-        seconds = document.querySelector('.timer__seconds'),
-        startBtn = document.querySelector('.reminder__playBtn'),
+    const minutes = document.querySelector('.reminder__timer-minutes'),
+        seconds = document.querySelector('.reminder__timer-seconds'),
+        controlBtns = document.querySelectorAll('[data-control]'),
         counterBtns = document.querySelectorAll('.reminder__length-btn');
-    
+
     //default value to show in timer 
-    let defaultValue = 15;
+    let defaultValue = 15,
+        defaultZero = '00';
+    let timerId;
 
     minutes.textContent = defaultValue;
     //add event listener
-    startBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        //get value from page
-        const minutesInt = Number(minutes.textContent);
-        //transform to miliseconds
-        const miliseconds = minutesInt * 60000;
-        //get deadline
-        const endDate = (Date.parse(new Date()) + miliseconds);
-        //set timer
-        setTimer(endDate);
-        //disable buttons when we start timer so we cant change counter
-        counterBtns.forEach(btn => {
-            btn.disabled = true;
-        })
+    // startBtn.addEventListener('click', (e) => {
+    //     e.preventDefault();
+    //     //get value from page
+    //     const minutesInt = Number(minutes.textContent);
+    //     //transform to miliseconds
+    //     const miliseconds = minutesInt * 60000;
+    //     //get deadline
+    //     const endDate = (Date.parse(new Date()) + miliseconds);
+    //     //set timer
+    //     setTimer(endDate);
+    //     //disable buttons when we start timer so we cant change counter
+    //     counterBtns.forEach(btn => {
+    //         btn.disabled = true;
+    //     })
 
+    // })
+
+    let paused = false;
+    controlBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = e.currentTarget;
+            const control = target.dataset.control;
+
+            switch (control) {
+                case "play":
+                    //get value from page
+                    const minutesInMs = Number(minutes.textContent) * 60000;
+                    const secondsInMs = Number(seconds.textContent) * 1000;
+                    //transform to miliseconds
+                    const miliseconds = minutesInMs + secondsInMs;
+                    //get deadline
+                    const endDate = (Date.parse(new Date()) + miliseconds);
+                    //set timer
+                    setTimer(endDate);
+
+                    //disable buttons when we start timer so we cant change counter
+                    counterBtns.forEach(btn => {
+                        btn.disabled = true;
+                    })
+                    break;
+                case "pause":
+                    clearInterval(timerId);
+                    paused = true;
+                    break;
+                case "reset":
+                    clearInterval(timerId);
+                    minutes.textContent = defaultValue;
+                    seconds.textContent = defaultZero;
+                    counterBtns.forEach(btn => {
+                        btn.disabled = false;
+                    })
+                    break;
+            }
+        })
     })
 
     //get remaining time
@@ -33,7 +75,7 @@ window.addEventListener('DOMContentLoaded', () => {
         const timeRemaining = deadline - Date.parse(new Date());
         //transform to proper values
         const minutes = Math.floor((timeRemaining / 1000 / 60) % 60),
-              seconds = Math.floor((timeRemaining / 1000) % 60);
+            seconds = Math.floor((timeRemaining / 1000) % 60);
 
         //return as obj
         return {
@@ -45,12 +87,10 @@ window.addEventListener('DOMContentLoaded', () => {
 
     //setup Timer
     function setTimer(deadline) {
-        
+
         //function to update timer on page 
         function updateTimer() {
             const t = getTimeLeft(deadline);
-            console.log(t.minutes);
-            console.log(t.seconds)
             minutes.textContent = addZero(t.minutes);
             seconds.textContent = addZero(t.seconds);
             //if time diff reaches 0 - clearinterval, setup html , and play audio alarm, and enable back buttons!!
@@ -65,11 +105,11 @@ window.addEventListener('DOMContentLoaded', () => {
                 counterBtns.forEach(btn => {
                     btn.disabled = false;
                 })
-                
+
             }
         }
         //update timer every second
-        let timerId = setInterval(updateTimer, 1000);
+        timerId = setInterval(updateTimer, 1000);
     }
 
     //helper to add zeroes
@@ -93,7 +133,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 //but if we use currentTarget, we will have the element that contains event listener
                 const target = e.currentTarget;
                 //check if we click on plus button we increment counter
-                if (target.classList.contains('reminder__length-plus') ) { 
+                if (target.classList.contains('reminder__length-plus')) {
                     //if counter 60 then stop add +1 to counter, same for 0
                     if (counter == 60) {
                         counter += 0;
@@ -101,23 +141,23 @@ window.addEventListener('DOMContentLoaded', () => {
                         counter++;
                         console.log(counter);
                         minutes.textContent = addZero(counter);
-                    }                  
-                //else we decrement counter
+                    }
+                    //else we decrement counter
                 } else {
-                    if(counter === 0) {
-                       counter-= 0;
-                    } else{
+                    if (counter === 0) {
+                        counter -= 0;
+                    } else {
                         counter--;
                         minutes.textContent = addZero(counter);
                     }
-                } 
+                }
             })
         })
-    }  
+    }
 
-    
 
-    processClick('.reminder__length-btn', '.timer__minutes');
+
+    processClick('.reminder__length-btn', '.reminder__timer-minutes');
 
 
 })
