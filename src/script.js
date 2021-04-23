@@ -3,8 +3,11 @@ window.addEventListener('DOMContentLoaded', () => {
         seconds = document.querySelector('.timer__seconds'),
         startBtn = document.querySelector('.reminder__playBtn'),
         counterBtns = document.querySelectorAll('.reminder__length-btn');
+    
+    //default value to show in timer 
+    let defaultValue = 15;
 
-
+    minutes.textContent = defaultValue;
     //add event listener
     startBtn.addEventListener('click', (e) => {
         e.preventDefault();
@@ -50,9 +53,23 @@ window.addEventListener('DOMContentLoaded', () => {
             console.log(t.seconds)
             minutes.textContent = addZero(t.minutes);
             seconds.textContent = addZero(t.seconds);
+            //if time diff reaches 0 - clearinterval, setup html , and play audio alarm, and enable back buttons!!
+            if (t.total <= 0) {
+                clearInterval(timerId);
+                minutes.textContent = '00';
+                seconds.textContent = '00';
+                const audio = new Audio('https://res.cloudinary.com/dljezd6qv/video/upload/v1619188645/reminder-project/Alarm_Clock.wav');
+                audio.volume = 0.2;
+                audio.loop = false;
+                audio.play();
+                counterBtns.forEach(btn => {
+                    btn.disabled = false;
+                })
+                
+            }
         }
         //update timer every second
-        const timerId = setInterval(updateTimer, 1000);
+        let timerId = setInterval(updateTimer, 1000);
     }
 
     //helper to add zeroes
@@ -61,7 +78,7 @@ window.addEventListener('DOMContentLoaded', () => {
         return num >= 0 && num < 10 ? num = `0${num}` : num;
     }
 
-    //Adjust timer
+    //Adjusting timer, adding/substracting counter
 
     function processClick(buttonsSelector, minutesSelector) {
         const counterBtns = document.querySelectorAll(buttonsSelector);
