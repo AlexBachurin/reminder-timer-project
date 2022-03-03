@@ -11,7 +11,8 @@ window.addEventListener('DOMContentLoaded', () => {
     //timerId, counter for setupClock
     let timerId,
         counter,
-        repeatId;
+        repeatId,
+        repeatInnerId;
     //var for repeat
     let isRepeat = false;
 
@@ -91,6 +92,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     clearInterval(timerId);
                     //clear repeat
                     clearInterval(repeatId);
+                    isRepeat = false;
                     minutes.textContent = defaultValue;
                     seconds.textContent = addZero(defaultZero);
                     //set counter to default
@@ -109,9 +111,26 @@ window.addEventListener('DOMContentLoaded', () => {
                     minutes.textContent = counter;
                     seconds.textContent = addZero(defaultZero);
                     sessionValue.textContent = counter;
-                    endDate = getDeadline();
+                    endTime = getDeadline();
                     //while isRepeat in true state, cycle the timer
-                    repeatId = setInterval(() => setTimer(endDate), 60000 * counter);
+                    repeatId = setInterval(() => {
+                        clearInterval(repeatInnerId);
+                        setTimer(endTime)
+                        function updateTimer() {
+                            const t = getTimeLeft(endTime);
+                            minutes.textContent = addZero(t.minutes);
+                            seconds.textContent = addZero(t.seconds);
+                            console.log(t.minutes);
+                            console.log(t.seconds);
+                            if (t.total <= 0) {
+                                clearInterval(repeatInnerId);
+                                minutes.textContent = defaultValue;
+                                seconds.textContent = addZero(defaultZero)
+                            }
+
+                        }
+                        repeatInnerId = setInterval(updateTimer, 1000);
+                    }, 60000 * counter);
                     break;
 
 
@@ -147,6 +166,8 @@ window.addEventListener('DOMContentLoaded', () => {
             const t = getTimeLeft(deadline);
             minutes.textContent = addZero(t.minutes);
             seconds.textContent = addZero(t.seconds);
+            console.log(t.minutes);
+            console.log(t.seconds)
             //if time diff reaches 0 - clearinterval, setup html , and play audio alarm, and enable back buttons!!
             if (t.total <= 0) {
                 clearInterval(timerId);
