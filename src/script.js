@@ -111,6 +111,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     enableButtons();
                     enableControlButtons();
                     break;
+                //functionality works but timer doesnt show up on page
                 case "repeat":
                     //set repeat var to true
                     isRepeat = true;
