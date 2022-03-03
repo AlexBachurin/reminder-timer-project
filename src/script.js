@@ -10,7 +10,10 @@ window.addEventListener('DOMContentLoaded', () => {
         defaultZero = 0;
     //timerId, counter for setupClock
     let timerId,
-        counter;
+        counter,
+        repeatId;
+    //var for repeat
+    let isRepeat = false;
 
     //setup initial value
     minutes.textContent = defaultValue;
@@ -30,17 +33,32 @@ window.addEventListener('DOMContentLoaded', () => {
             btn.disabled = false;
         })
     }
+    //disable buttons for play/pause/repeat
+    function disableControlButtons() {
+        controlBtns.forEach(btn => {
+            if (btn.dataset.control !== 'reset') {
+                btn.disabled = true;
+            }
+
+        })
+    }
+    //enable control buttons 
+    function enableControlButtons() {
+        controlBtns.forEach(btn => {
+            btn.disabled = false;
+        })
+    }
     //calculate deadline
     function getDeadline() {
-         //get value from page
-         const minutesInMs = Number(minutes.textContent) * 60000;
-         const secondsInMs = Number(seconds.textContent) * 1000;
-         //transform to miliseconds
-         const miliseconds = minutesInMs + secondsInMs;
-         //get deadline
-         const endDate = (Date.parse(new Date()) + miliseconds);
-         //set timer
-         return endDate;
+        //get value from page
+        const minutesInMs = Number(minutes.textContent) * 60000;
+        const secondsInMs = Number(seconds.textContent) * 1000;
+        //transform to miliseconds
+        const miliseconds = minutesInMs + secondsInMs;
+        //get deadline
+        const endDate = (Date.parse(new Date()) + miliseconds);
+        //set timer
+        return endDate;
     }
 
     //add event listeners for each control button
@@ -49,6 +67,7 @@ window.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const target = e.currentTarget;
             const control = target.dataset.control;
+            console.log(control);
             let endDate;
             //depending on which button we clicked  handle different approaches
             switch (control) {
@@ -57,7 +76,8 @@ window.addEventListener('DOMContentLoaded', () => {
                     //and start timer
                     endDate = getDeadline();
                     setTimer(endDate);
-
+                    //disable control buttons;
+                    disableControlButtons(true);
                     //disable buttons when we start timer so we cant change counter
                     disableButtons();
                     break;
@@ -66,24 +86,35 @@ window.addEventListener('DOMContentLoaded', () => {
                     clearInterval(timerId);
                     break;
                 case "reset":
+
                     //clear timer, reset minutes, sessionValue and counter to defaults and enable buttons
                     clearInterval(timerId);
+                    //clear repeat
+                    clearInterval(repeatId);
                     minutes.textContent = defaultValue;
                     seconds.textContent = addZero(defaultZero);
                     //set counter to default
                     counter = defaultValue;
                     sessionValue.textContent = counter;
                     enableButtons();
+                    enableControlButtons();
                     break;
                 case "repeat":
+                    //set repeat var to true
+                    isRepeat = true;
+                    disableButtons();
+                    disableControlButtons();
                     //clear timer, set minutes and sessionValue to counter, get date and start timer
                     clearInterval(timerId);
                     minutes.textContent = counter;
                     seconds.textContent = addZero(defaultZero);
                     sessionValue.textContent = counter;
                     endDate = getDeadline();
-                    setTimer(endDate);
-                    
+                    //while isRepeat in true state, cycle the timer
+                    repeatId = setInterval(() => setTimer(endDate), 60000 * counter);
+                    break;
+
+
             }
         })
     })
@@ -119,13 +150,16 @@ window.addEventListener('DOMContentLoaded', () => {
             //if time diff reaches 0 - clearinterval, setup html , and play audio alarm, and enable back buttons!!
             if (t.total <= 0) {
                 clearInterval(timerId);
-                minutes.textContent = '00';
-                seconds.textContent = '00';
+                minutes.textContent = defaultValue;
+                seconds.textContent = addZero(defaultZero);
                 const audio = new Audio('https://res.cloudinary.com/dljezd6qv/video/upload/v1619188645/reminder-project/Alarm_Clock.wav');
                 audio.volume = 0.2;
                 audio.loop = false;
                 audio.play();
-                enableButtons();
+                if (!isRepeat) {
+                    enableButtons();
+                    enableControlButtons();
+                }
 
             }
         }
@@ -143,8 +177,8 @@ window.addEventListener('DOMContentLoaded', () => {
 
     function processClick(buttonsSelector, minutesSelector, sessionValueSelector) {
         const counterBtns = document.querySelectorAll(buttonsSelector),
-              minutes = document.querySelector(minutesSelector),
-              sessionValue  =document.querySelector(sessionValueSelector);
+            minutes = document.querySelector(minutesSelector),
+            sessionValue = document.querySelector(sessionValueSelector);
         counter = minutes.textContent;
         //add event listeners for btns
         counterBtns.forEach(btn => {
@@ -159,11 +193,12 @@ window.addEventListener('DOMContentLoaded', () => {
                     //if counter 60 then stop add +1 to counter, same for 0
                     if (counter == 60) {
                         counter += 0;
-                        
+
                     } else {
                         counter++;
                         minutes.textContent = addZero(counter);
                         sessionValue.textContent = counter;
+                        defaultValue = counter;
                     }
                     //else we decrement counter
                 } else {
@@ -173,6 +208,7 @@ window.addEventListener('DOMContentLoaded', () => {
                         counter--;
                         minutes.textContent = addZero(counter);
                         sessionValue.textContent = counter;
+                        defaultValue = counter
                     }
                 }
             })
