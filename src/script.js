@@ -34,13 +34,23 @@ window.addEventListener('DOMContentLoaded', () => {
             btn.disabled = false;
         })
     }
-    //disable buttons for play/pause/repeat
-    function disableControlButtons() {
+    //disable buttons for play//repeat
+    function disableControlButtonsOnPlay() {
+        controlBtns.forEach(btn => {
+            if (btn.dataset.control === 'reset' || btn.dataset.control === 'pause') {
+                btn.disabled = false;
+            }
+            else {
+                btn.disabled = true;
+            }
+
+        })
+    }
+    function disableControlButtonsOnRepeat() {
         controlBtns.forEach(btn => {
             if (btn.dataset.control !== 'reset') {
                 btn.disabled = true;
             }
-
         })
     }
     //enable control buttons 
@@ -78,7 +88,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     endDate = getDeadline();
                     setTimer(endDate);
                     //disable control buttons;
-                    disableControlButtons(true);
+                    disableControlButtonsOnPlay();
                     //disable buttons when we start timer so we cant change counter
                     disableButtons();
                     break;
@@ -104,20 +114,16 @@ window.addEventListener('DOMContentLoaded', () => {
                 case "repeat":
                     //set repeat var to true
                     isRepeat = true;
-                    disableButtons();
-                    disableControlButtons();
                     //clear timer, set minutes and sessionValue to counter, get date and start timer
                     clearInterval(timerId);
-                    minutes.textContent = counter;
-                    seconds.textContent = addZero(defaultZero);
-                    sessionValue.textContent = counter;
-                    endTime = getDeadline();
+                    endDate = getDeadline();
                     //while isRepeat in true state, cycle the timer
                     repeatId = setInterval(() => {
-                        clearInterval(repeatInnerId);
-                        setTimer(endTime)
+                        // clearInterval(repeatInnerId);
+                        // setTimer(endTime)
                         function updateTimer() {
-                            const t = getTimeLeft(endTime);
+                            let t = getTimeLeft(endDate);
+                            console.log(t)
                             minutes.textContent = addZero(t.minutes);
                             seconds.textContent = addZero(t.seconds);
                             console.log(t.minutes);
@@ -126,11 +132,17 @@ window.addEventListener('DOMContentLoaded', () => {
                                 clearInterval(repeatInnerId);
                                 minutes.textContent = defaultValue;
                                 seconds.textContent = addZero(defaultZero)
+                                const audio = new Audio('https://res.cloudinary.com/dljezd6qv/video/upload/v1619188645/reminder-project/Alarm_Clock.wav');
+                                audio.volume = 0.2;
+                                audio.loop = false;
+                                audio.play();
                             }
 
                         }
                         repeatInnerId = setInterval(updateTimer, 1000);
                     }, 60000 * counter);
+                    disableButtons();
+                    disableControlButtonsOnRepeat();
                     break;
 
 
@@ -166,6 +178,7 @@ window.addEventListener('DOMContentLoaded', () => {
             const t = getTimeLeft(deadline);
             minutes.textContent = addZero(t.minutes);
             seconds.textContent = addZero(t.seconds);
+            console.log(t)
             console.log(t.minutes);
             console.log(t.seconds)
             //if time diff reaches 0 - clearinterval, setup html , and play audio alarm, and enable back buttons!!
