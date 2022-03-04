@@ -179,9 +179,6 @@ window.addEventListener('DOMContentLoaded', () => {
             const t = getTimeLeft(deadline);
             minutes.textContent = addZero(t.minutes);
             seconds.textContent = addZero(t.seconds);
-            console.log(t)
-            console.log(t.minutes);
-            console.log(t.seconds)
             //if time diff reaches 0 - clearinterval, setup html , and play audio alarm, and enable back buttons!!
             if (t.total <= 0) {
                 clearInterval(timerId);
