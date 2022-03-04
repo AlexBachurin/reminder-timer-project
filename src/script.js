@@ -95,6 +95,12 @@ window.addEventListener('DOMContentLoaded', () => {
                 case "pause":
                     //just clear timer
                     clearInterval(timerId);
+                    //also enable start btn
+                    controlBtns.forEach(btn => {
+                        if (btn.dataset.control === 'play') {
+                            btn.disabled = false;
+                        }
+                    })
                     break;
                 case "reset":
 
