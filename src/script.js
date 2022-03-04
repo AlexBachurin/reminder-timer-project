@@ -103,7 +103,6 @@ window.addEventListener('DOMContentLoaded', () => {
                     })
                     break;
                 case "reset":
-
                     //clear timer, reset minutes, sessionValue and counter to defaults and enable buttons
                     clearInterval(timerId);
                     //clear repeat
@@ -124,7 +123,7 @@ window.addEventListener('DOMContentLoaded', () => {
                     //clear timer, set minutes and sessionValue to counter, get date and start timer
                     clearInterval(timerId);
                     endDate = getDeadline();
-                    //while isRepeat in true state, cycle the timer
+                    //set interval based on current counter to cycle repeat it
                     repeatId = setInterval(() => {
                         // clearInterval(repeatInnerId);
                         // setTimer(endTime)
@@ -136,6 +135,7 @@ window.addEventListener('DOMContentLoaded', () => {
                             console.log(t.minutes);
                             console.log(t.seconds);
                             if (t.total <= 0) {
+                                //clear inner interval
                                 clearInterval(repeatInnerId);
                                 minutes.textContent = defaultValue;
                                 seconds.textContent = addZero(defaultZero)
